@@ -4,9 +4,12 @@
 MACBACKUP_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/macbackup"
 MACBACKUP_CONFIG="$MACBACKUP_CONFIG_DIR/config"
 MACBACKUP_STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/macbackup"
+# shellcheck disable=SC2034
 MACBACKUP_LOG_DIR="$HOME/Library/Logs/macbackup"
 MACBACKUP_ALL_MODULES="brew dotfiles vscode defaults launchagents system"
 
+# Set by command option parsing in the other lib files.
+# shellcheck disable=SC2034
 DRY_RUN=0
 ASSUME_YES=0
 ONLY_MODULES=""
@@ -112,6 +115,12 @@ ensure_data_repo() {
 fresh_dir() { rm -rf "$1"; mkdir -p "$1"; }
 
 count_files() { find "$1" -type f 2>/dev/null | wc -l | tr -d ' '; }
+
+# count_matching <dir> <glob>; number of entries in dir matching the glob.
+count_matching() { find "$1" -maxdepth 1 -name "$2" 2>/dev/null | wc -l | tr -d ' '; }
+
+# list_basenames <dir> <glob>; sorted basenames of matching entries.
+list_basenames() { find "$1" -maxdepth 1 -name "$2" -exec basename {} \; 2>/dev/null | sort; }
 
 timestamp() { date +%Y-%m-%dT%H:%M:%S%z; }
 

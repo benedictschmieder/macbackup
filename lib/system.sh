@@ -17,7 +17,7 @@ backup_system() {
   } > "$dest/info.txt"
   {
     echo "# Applications present on $(hostname -s). Anything not covered by the Brewfile was installed another way."
-    ls /Applications "$HOME/Applications" 2>/dev/null | grep '\.app$' | sort -u
+    find /Applications "$HOME/Applications" -maxdepth 1 -name '*.app' -exec basename {} \; 2>/dev/null | sort -u
   } > "$dest/applications.txt"
   ok "info.txt, applications.txt"
 }

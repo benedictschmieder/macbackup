@@ -37,7 +37,7 @@ cmd_doctor() {
     DOCTOR_LABEL="daily schedule loaded";               check schedule_is_loaded
     DOCTOR_LABEL="scheduled run can read all preference domains (else: macbackup schedule access)"; check test "$(read_state scheduled)" != 1 -o -z "$(read_state unreadable_domains)"
   fi
-  [ "$failures" -eq 0 ] && ok "everything looks fine" || warn "$failures check(s) failed"
+  if [ "$failures" -eq 0 ]; then ok "everything looks fine"; else warn "$failures check(s) failed"; fi
   return 0
 }
 

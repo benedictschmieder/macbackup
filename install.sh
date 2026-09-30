@@ -31,6 +31,7 @@ if ! command -v brew >/dev/null 2>&1; then
       eval "$(/usr/local/bin/brew shellenv)"
     fi
     if ! grep -qs 'brew shellenv' "$HOME/.zprofile"; then
+      # shellcheck disable=SC2016
       printf '\neval "$(%s shellenv)"\n' "$(command -v brew)" >> "$HOME/.zprofile"
     fi
   fi

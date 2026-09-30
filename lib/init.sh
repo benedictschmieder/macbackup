@@ -10,7 +10,7 @@ cmd_init() {
       --data-dir) dir="$2"; shift ;;
       --data-dir=*) dir="${1#--data-dir=}" ;;
       --no-schedule) schedule=0 ;;
-      --yes|-y) ASSUME_YES=1 ;;
+      --yes|-y) ASSUME_YES=1 ;; # shellcheck disable=SC2034
       -h|--help) usage_init; return 0 ;;
       *) die "Unknown option for init: $1 (see 'macbackup init --help')" ;;
     esac

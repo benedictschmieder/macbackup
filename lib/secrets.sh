@@ -55,6 +55,7 @@ apply_allowlist() {
 
 scan_plists() {
   # Flags plist keys with secret-looking names whose value is a non-empty string or data.
+  # shellcheck disable=SC2016
   find "$1" -name '*.plist' -not -path '*/.git/*' -print0 2>/dev/null | xargs -0 awk '
     /<key>/ {
       k = tolower($0)

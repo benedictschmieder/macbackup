@@ -64,8 +64,8 @@ strip_volatile_keys() {
 restore_defaults() {
   local src="$DATA_DIR/defaults" file domain
   if [ ! -d "$src" ] || [ -z "$(ls "$src" 2>/dev/null)" ]; then warn "No preferences in backup, skipping"; return 0; fi
-  info "macOS preferences: $(ls "$src" | grep -c '\.plist$') domains"
-  ls "$src" | sed 's/\.plist$//' | sed 's/^/  /'
+  info "macOS preferences: $(count_matching "$src" '*.plist') domains"
+  list_basenames "$src" '*.plist' | sed 's/\.plist$//' | sed 's/^/  /'
   log "  Importing replaces the current settings of these domains."
   confirm "Import them?" || return 0
   for file in "$src"/*.plist; do
