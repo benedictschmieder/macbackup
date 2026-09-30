@@ -30,7 +30,7 @@ macbackup init      # logs in to GitHub, creates the private repo <you>/macbacku
 macbackup backup    # first backup
 ```
 
-The backup runs daily via launchd (12:00 by default, missed runs happen after wake-up) and only pushes when something changed. Failures show up as a macOS notification and in `~/Library/Logs/macbackup/backup.log`.
+The backup runs daily via launchd (12:00 by default, missed runs happen after wake-up) and only pushes when something changed. Preferences of sandboxed apps (Maccy, Shottr, TextEdit and similar) cannot be read from launchd without Full Disk Access, so the scheduled run keeps their last export and a manual `macbackup backup` from the terminal refreshes them. Failures show up as a macOS notification and in `~/Library/Logs/macbackup/backup.log`.
 
 ## Restore on a new Mac
 
@@ -52,6 +52,7 @@ The settings live in the backup repository as `macbackup.conf`, so every Mac res
 - `EXCLUDE_PATTERNS`: names never copied (rsync exclude syntax)
 - `DEFAULTS_DOMAINS`: preference domains to export (`defaults domains | tr ',' '\n'` lists what exists)
 - `DEFAULTS_STRIP_KEYS`: `domain:key` entries removed from exports, for volatile values and license keys
+- `DEFAULTS_STRIP_KEY_PATTERNS`: regular expressions for top-level keys removed from every domain (window positions, telemetry)
 - `SECRET_ALLOWLIST`: regular expressions for confirmed false positives of the secret scanner
 - `MODULES`, `BACKUP_HOUR`, `BACKUP_MINUTE`, `VSCODE_USER_DIR`
 

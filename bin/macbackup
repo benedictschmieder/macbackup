@@ -1,6 +1,7 @@
 #!/bin/bash
 # macbackup: back up Homebrew software and macOS configuration to a private GitHub repository.
 set -eo pipefail
+export LC_ALL=C
 
 MACBACKUP_VERSION="0.1.0"
 
