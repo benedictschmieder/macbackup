@@ -29,6 +29,10 @@ cmd_restore() {
     if module_enabled "$m"; then "restore_$m"; fi
   done
 
+  if [ "$DRY_RUN" != 1 ] && [ -z "$ONLY_MODULES" ]; then
+    claim_backup
+    ok "this Mac now owns the backup in $DATA_REPO"
+  fi
   if [ -d "$RESTORE_BACKUP_DIR" ]; then
     log "Previous versions of replaced files are in $RESTORE_BACKUP_DIR"
   fi

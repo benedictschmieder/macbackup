@@ -52,7 +52,7 @@ Use one backup repository per Mac. Point each machine at its own repo during set
 macbackup init --repo <you>/macbackup-<machine name>
 ```
 
-A new Mac restores from whichever repo you name in `macbackup init`. Two Macs must not share a repository: the layout is flat, so they would overwrite each other's files and the shrink guard would block the smaller one.
+A new Mac restores from whichever repo you name in `macbackup init`. Each repository records which Mac it belongs to in `.macbackup-host`. A different Mac that runs `macbackup backup` against it is refused, with the two ways out spelled out: `macbackup init --repo` for a separate backup, or `macbackup restore` (or `backup --force`) to take the backup over, which is the normal path for a replacement machine.
 
 ## Configure what is backed up
 

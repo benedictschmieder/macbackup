@@ -47,9 +47,14 @@ cmd_init() {
   DATA_REPO="$repo"; DATA_DIR="$dir"
 
   if [ -f "$dir/Brewfile" ]; then
-    info "The repository already contains a backup"
-    log "  Run 'macbackup restore' to apply it to this Mac."
-    log "  Run 'macbackup backup --force' instead if this Mac should overwrite it."
+    local owner
+    owner="$(backup_owner)"
+    info "The repository already contains a backup${owner:+ of '$owner'}"
+    log "  Run 'macbackup restore' to apply it to this Mac, which then owns the backup."
+    log "  Run 'macbackup backup --force' instead if this Mac should overwrite it without restoring."
+    if [ -n "$owner" ] && [ "$owner" != "$(this_host)" ]; then
+      log "  For a separate backup of this Mac, re-run: macbackup init --repo $login/macbackup-<name>"
+    fi
     log "  The daily schedule is installed after a restore, or with 'macbackup schedule install'."
   else
     if [ "$schedule" = 1 ]; then load_config; schedule_install; fi

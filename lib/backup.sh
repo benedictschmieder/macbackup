@@ -28,6 +28,7 @@ cmd_backup() {
   info "Backing up $(hostname -s) to $DATA_REPO"
 
   pull_data_repo
+  ensure_backup_owner "$force"
   local previous_entries=0
   [ -f "$DATA_DIR/Brewfile" ] && previous_entries="$(brewfile_entry_count "$DATA_DIR/Brewfile")"
 
@@ -36,6 +37,7 @@ cmd_backup() {
     if module_enabled "$m"; then "backup_$m"; fi
   done
   write_data_repo_files
+  claim_backup
 
   guard_against_shrinking_brewfile "$previous_entries" "$force"
 

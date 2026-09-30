@@ -12,6 +12,7 @@ Software and configuration of a Mac, collected by [macbackup](https://github.com
 - `launchagents/`: user LaunchAgents and the list of login items.
 - `system/`: macOS version, hardware and the applications present, for reference only.
 - `macbackup.conf`: what gets backed up. Edit this to add or remove items.
+- `.macbackup-host`: the Mac this backup belongs to. Another Mac is refused until it restores or forces.
 
 ## Restore on a new Mac
 

@@ -3,8 +3,10 @@
 
 cmd_status() {
   load_config
+  local owner
+  owner="$(backup_owner)"
   info "macbackup $MACBACKUP_VERSION"
-  log "  repository:  $DATA_REPO"
+  log "  repository:  $DATA_REPO${owner:+ (backup of $owner)}"
   log "  checkout:    $DATA_DIR"
   log "  settings:    $DATA_DIR/macbackup.conf"
   log "  modules:     $MODULES"

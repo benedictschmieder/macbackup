@@ -108,6 +108,25 @@ module_enabled() {
 
 data_git() { git -C "$DATA_DIR" "$@"; }
 
+HOST_MARKER=".macbackup-host"
+
+this_host() { hostname -s; }
+
+backup_owner() { cat "$DATA_DIR/$HOST_MARKER" 2>/dev/null || true; }
+
+# Refuses to touch a repository that holds another Mac's backup unless forced.
+ensure_backup_owner() {
+  local force="$1" owner
+  owner="$(backup_owner)"
+  [ -n "$owner" ] && [ "$owner" != "$(this_host)" ] || return 0
+  [ "$force" = 1 ] && { warn "taking over the backup of $owner"; return 0; }
+  die "$DATA_REPO holds the backup of '$owner', this Mac is '$(this_host)'.
+  For a separate backup of this Mac, run: macbackup init --repo <owner>/macbackup-<name>
+  To replace '$owner' with this Mac, run: macbackup restore   (or: macbackup backup --force)"
+}
+
+claim_backup() { printf '%s\n' "$(this_host)" > "$DATA_DIR/$HOST_MARKER"; }
+
 ensure_data_repo() {
   [ -d "$DATA_DIR/.git" ] || die "Backup directory $DATA_DIR is not a git repository. Run 'macbackup init'."
 }
