@@ -44,6 +44,16 @@ Each restore step asks for confirmation. Use `--only brew,dotfiles` to run a sub
 
 `macbackup backup` refuses to overwrite a backup with one that has less than half as many Homebrew entries, which protects the backup from a freshly set up Mac that has not been restored yet. Use `--force` when the shrink is intended.
 
+## Several Macs
+
+Use one backup repository per Mac. Point each machine at its own repo during setup:
+
+```sh
+macbackup init --repo <you>/macbackup-<machine name>
+```
+
+A new Mac restores from whichever repo you name in `macbackup init`. Two Macs must not share a repository: the layout is flat, so they would overwrite each other's files and the shrink guard would block the smaller one.
+
 ## Configure what is backed up
 
 The settings live in the backup repository as `macbackup.conf`, so every Mac restored from it keeps the same settings. The file is plain bash:
