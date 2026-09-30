@@ -25,6 +25,8 @@ backup_defaults() {
       fi
     else
       strip_volatile_keys "$domain" "$file"
+      # A domain that only held volatile keys is not worth keeping.
+      if ! plist_has_keys "$file"; then rm -f "$file"; continue; fi
     fi
     n=$((n + 1))
   done
