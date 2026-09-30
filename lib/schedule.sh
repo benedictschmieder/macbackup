@@ -36,9 +36,10 @@ build_agent() {
   mkdir -p "$MACBACKUP_ROOT/libexec"
   cc -O2 -o "$AGENT_BIN" "$src" 2>/dev/null || return 1
   codesign --force --sign - --identifier dev.macbackup.agent "$AGENT_BIN" >/dev/null 2>&1 || true
+  if [ -f "$built" ]; then
+    warn "the launcher was rebuilt; if you had granted it Full Disk Access, grant it again (macbackup schedule access)"
+  fi
   cp "$src" "$built"
-  [ -f "$built.first" ] || warn "the launcher was rebuilt; if you had granted it Full Disk Access, grant it again (macbackup schedule access)"
-  touch "$built.first"
 }
 
 schedule_install() {

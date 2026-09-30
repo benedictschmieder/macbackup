@@ -45,8 +45,8 @@ cmd_update() {
   info "Updating macbackup in $MACBACKUP_ROOT"
   git -C "$MACBACKUP_ROOT" pull -q --ff-only || die "update failed; check 'git -C $MACBACKUP_ROOT status'"
   ok "now at $(git -C "$MACBACKUP_ROOT" log -1 --format='%h %s')"
+  # The updated code must do the reinstall, not the copy loaded before the pull.
   if [ -f "$MACBACKUP_CONFIG" ] && schedule_is_loaded; then
-    load_config
-    schedule_install
+    exec /bin/bash "$MACBACKUP_ROOT/bin/macbackup" schedule install
   fi
 }
