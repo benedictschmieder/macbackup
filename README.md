@@ -30,7 +30,7 @@ macbackup init      # logs in to GitHub, creates the private repo <you>/macbacku
 macbackup backup    # first backup
 ```
 
-The backup runs daily via launchd (12:00 by default, missed runs happen after wake-up) and only pushes when something changed. Preferences of sandboxed apps (Maccy, Shottr, TextEdit and similar) can only be read with Full Disk Access. The schedule runs through a small launcher binary in `~/.macbackup/libexec`, so you can grant that access to the launcher alone rather than to `/bin/bash`; `macbackup schedule access` opens the right settings pane and explains the steps. Until then the scheduled run keeps the last export of those domains and a manual `macbackup backup` from the terminal refreshes them. Failures show up as a macOS notification and in `~/Library/Logs/macbackup/backup.log`.
+The backup runs daily via launchd (12:00 by default, missed runs happen after wake-up) and only pushes when something changed. The schedule runs through a small launcher binary in `~/.macbackup/libexec` rather than through `/bin/bash` directly, which lets it read the preferences of sandboxed apps (Maccy, Shottr, TextEdit and similar). Should `macbackup schedule status` ever report domains the scheduled run could not read, the run keeps their last export, and `macbackup schedule access` explains how to grant Full Disk Access to the launcher alone. Failures show up as a macOS notification and in `~/Library/Logs/macbackup/backup.log`.
 
 ## Restore on a new Mac
 
