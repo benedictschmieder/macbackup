@@ -7,7 +7,7 @@ Backs up the software and configuration of a Mac to a private GitHub repository,
 | Module | Content | Restore |
 | --- | --- | --- |
 | `brew` | `Brewfile` with taps, formulae installed on request, casks and `mas` apps | `brew bundle install` |
-| `dotfiles` | Shell, git, ssh config, Claude Code settings, and all of `~/.config` | Copied back, replaced files are saved first |
+| `dotfiles` | Shell, git, ssh config, Claude Code and Claude Desktop settings, all of `~/.config`, Quick Actions, custom dictionary, Docker, Bambu Studio and Obsidian settings | Copied back, replaced files are saved first |
 | `vscode` | VS Code `settings.json`, `keybindings.json`, snippets, `mcp.json`, extension list | Copied back, extensions installed via `code` |
 | `defaults` | Exported macOS preference domains: system settings plus the preferences of every installed app, found by bundle identifier | `defaults import` |
 | `launchagents` | User LaunchAgents and login items | Copied back and loaded, login items re-added |
