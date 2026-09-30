@@ -1,0 +1,60 @@
+#!/bin/bash
+# macbackup: back up Homebrew software and macOS configuration to a private GitHub repository.
+set -eo pipefail
+
+MACBACKUP_VERSION="0.1.0"
+
+resolve_root() {
+  local src="${BASH_SOURCE[0]}" dir
+  while [ -L "$src" ]; do
+    dir="$(cd -P "$(dirname "$src")" && pwd)"
+    src="$(readlink "$src")"
+    case "$src" in /*) ;; *) src="$dir/$src" ;; esac
+  done
+  cd -P "$(dirname "$src")/.." && pwd
+}
+MACBACKUP_ROOT="$(resolve_root)"
+
+for lib in "$MACBACKUP_ROOT"/lib/*.sh; do
+  # shellcheck source=/dev/null
+  . "$lib"
+done
+
+usage() {
+  cat <<USAGE
+macbackup $MACBACKUP_VERSION
+
+Usage: macbackup <command> [options]
+
+Commands:
+  init       Set up GitHub access and the private backup repository
+  backup     Back up Homebrew software, dotfiles, VS Code and macOS settings
+  restore    Apply the backup to this Mac
+  status     Show configuration, pending changes and the schedule
+  schedule   Manage the daily launchd backup (install, remove, status, run)
+  doctor     Check that all prerequisites are in place
+  update     Update macbackup itself
+  version    Print the version
+
+Run 'macbackup <command> --help' for command options.
+USAGE
+}
+
+main() {
+  local cmd="${1:-}"
+  [ $# -gt 0 ] && shift
+  case "$cmd" in
+    init) cmd_init "$@" ;;
+    backup) cmd_backup "$@" ;;
+    restore) cmd_restore "$@" ;;
+    status) cmd_status "$@" ;;
+    schedule) cmd_schedule "$@" ;;
+    doctor) cmd_doctor "$@" ;;
+    update) cmd_update "$@" ;;
+    version|--version|-v) echo "macbackup $MACBACKUP_VERSION" ;;
+    ""|help|-h|--help) usage ;;
+    *) die "Unknown command '$cmd'. Run 'macbackup help'." ;;
+  esac
+}
+
+main "$@"
