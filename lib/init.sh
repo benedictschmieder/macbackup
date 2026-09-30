@@ -49,9 +49,8 @@ cmd_init() {
   if [ -f "$dir/Brewfile" ]; then
     local owner
     owner="$(backup_owner)"
-    info "The repository already contains a backup${owner:+ of '$owner'}"
+    info "The repository already contains a backup${owner:+ of $owner}"
     log "  Run 'macbackup restore' to apply it to this Mac, which then owns the backup."
-    # shellcheck disable=SC2016
     log "  Run 'macbackup backup --force' instead if this Mac should overwrite it without restoring."
     if [ -n "$owner" ] && [ "$owner" != "$(this_host)" ]; then
       log "  For a separate backup of this Mac, re-run: macbackup init --repo $login/macbackup-<name>"
