@@ -2,10 +2,11 @@
 # The restore command: apply the backup to this Mac.
 
 cmd_restore() {
+  # shellcheck disable=SC2034
   while [ $# -gt 0 ]; do
     case "$1" in
       --dry-run) DRY_RUN=1 ;;
-      --yes|-y) ASSUME_YES=1 ;; # shellcheck disable=SC2034
+      --yes|-y) ASSUME_YES=1 ;;
       --only) ONLY_MODULES="$2"; shift ;;
       --only=*) ONLY_MODULES="${1#--only=}" ;;
       -h|--help) usage_restore; return 0 ;;
