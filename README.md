@@ -7,13 +7,15 @@ Backs up the software and configuration of a Mac to a private GitHub repository,
 | Module | Content | Restore |
 | --- | --- | --- |
 | `brew` | `Brewfile` with taps, formulae installed on request, casks and `mas` apps | `brew bundle install` |
-| `dotfiles` | Configured files under `$HOME` (shell, git, gh, tool configs, Claude Code settings) | Copied back, replaced files are saved first |
+| `dotfiles` | Shell, git, ssh config, Claude Code settings, and all of `~/.config` | Copied back, replaced files are saved first |
 | `vscode` | VS Code `settings.json`, `keybindings.json`, snippets, `mcp.json`, extension list | Copied back, extensions installed via `code` |
-| `defaults` | Exported macOS preference domains (Dock, Finder, keyboard, trackpad, hot keys, and installed utilities) | `defaults import` |
+| `defaults` | Exported macOS preference domains: system settings plus the preferences of every installed app, found by bundle identifier | `defaults import` |
 | `launchagents` | User LaunchAgents and login items | Copied back and loaded, login items re-added |
 | `system` | macOS version, hardware, list of installed applications | Reference only |
 
-Every run is scanned for secrets (GitHub, OpenAI, AWS, Slack, Google tokens, private keys, JWTs, generic `token=`/`password=` assignments and license or password keys inside plists) before anything is committed. A hit aborts the backup and shows the file and line. Known secret-holding files such as `~/.config/gh/hosts.yml`, `known_hosts`, keys and certificates are excluded up front, and volatile or license keys are stripped from exported preferences.
+New apps and tools are picked up without configuration: the Brewfile follows Homebrew, app preferences are found by bundle identifier, extensions and login items are listed live, and `~/.config` is copied as a whole. Exports larger than a size cap are skipped as state rather than settings.
+
+Every run is scanned for secrets (GitHub, OpenAI, AWS, Slack, Google tokens, private keys, JWTs, generic `token=`/`password=` assignments) before anything is committed. License, password or token keys inside exported preferences are removed automatically and reported. A hit in a text file aborts the backup and shows the file and line. Known secret-holding files such as `~/.config/gh/hosts.yml`, `known_hosts`, keys and certificates are excluded up front, and volatile keys are stripped from exported preferences.
 
 ## Install
 
@@ -58,9 +60,11 @@ A new Mac restores from whichever repo you name in `macbackup init`. Each reposi
 
 The settings live in the backup repository as `macbackup.conf`, so every Mac restored from it keeps the same settings. The file is plain bash:
 
+- `DOTFILES_AUTO_CONFIG`, `DOTFILES_MAX_SIZE_KB`: copy all of `~/.config`, skipping large files
 - `DOTFILES`: files and directories relative to `$HOME`
 - `EXCLUDE_PATTERNS`: names never copied (rsync exclude syntax)
-- `DEFAULTS_DOMAINS`: preference domains to export (`defaults domains | tr ',' '\n'` lists what exists)
+- `DEFAULTS_AUTO_APPS`, `DEFAULTS_APP_DIRS`, `DEFAULTS_EXCLUDE_DOMAINS`, `DEFAULTS_MAX_SIZE_KB`: automatic export of installed apps' preferences
+- `DEFAULTS_DOMAINS`: preference domains always exported (`defaults domains | tr ',' '\n'` lists what exists)
 - `DEFAULTS_STRIP_KEYS`: `domain:key` entries removed from exports, for volatile values and license keys
 - `DEFAULTS_STRIP_KEY_PATTERNS`: regular expressions for top-level keys removed from every domain (window positions, telemetry)
 - `SECRET_ALLOWLIST`: regular expressions for confirmed false positives of the secret scanner

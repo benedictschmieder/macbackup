@@ -8,12 +8,14 @@ backup_dotfiles() {
   local p
   for p in "${EXCLUDE_PATTERNS[@]}"; do excludes+=(--exclude "$p"); done
   fresh_dir "$dest"
-  for item in "${DOTFILES[@]}"; do
+  local items=("${DOTFILES[@]}")
+  if [ "${DOTFILES_AUTO_CONFIG:-0}" = 1 ]; then items+=(.config); fi
+  for item in "${items[@]}"; do
     item="${item%/}"
     [ -e "$HOME/$item" ] || continue
     parent="$dest/$(dirname "$item")"
     mkdir -p "$parent"
-    rsync -aL "${excludes[@]}" "$HOME/$item" "$parent/"
+    rsync -aL --max-size="${DOTFILES_MAX_SIZE_KB:-1024}k" "${excludes[@]}" "$HOME/$item" "$parent/"
     n=$((n + 1))
   done
   ok "$n entries, $(count_files "$dest") files"

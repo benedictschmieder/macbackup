@@ -8,7 +8,7 @@ Software and configuration of a Mac, collected by [macbackup](https://github.com
 - `brew/`: full formula list including dependencies, for reference only.
 - `dotfiles/`: copies of the configured files under the home directory, same relative paths.
 - `vscode/`: VS Code settings, keybindings, snippets, MCP config and extension list.
-- `defaults/`: exported macOS preference domains (one XML plist per domain).
+- `defaults/`: exported macOS preference domains (one XML plist per domain), including every installed app. License and password keys are removed before commit.
 - `launchagents/`: user LaunchAgents and the list of login items.
 - `system/`: macOS version, hardware and the applications present, for reference only.
 - `macbackup.conf`: what gets backed up. Edit this to add or remove items.
