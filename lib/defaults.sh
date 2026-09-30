@@ -32,6 +32,7 @@ backup_defaults() {
   done
   rm -rf "$prev"
   ok "$n domains"
+  record_state unreadable_domains "$kept"
   [ -z "$kept" ] || log "  not readable here, kept previous export:$kept"
 }
 

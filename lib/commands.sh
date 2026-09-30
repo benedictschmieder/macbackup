@@ -35,6 +35,7 @@ cmd_doctor() {
     DOCTOR_LABEL="backup checkout is a git repository"; check test -d "$DATA_DIR/.git"
     DOCTOR_LABEL="backup remote reachable";             check data_git ls-remote --exit-code origin HEAD
     DOCTOR_LABEL="daily schedule loaded";               check schedule_is_loaded
+    DOCTOR_LABEL="scheduled run can read all preference domains (else: macbackup schedule access)"; check test "$(read_state scheduled)" != 1 -o -z "$(read_state unreadable_domains)"
   fi
   [ "$failures" -eq 0 ] && ok "everything looks fine" || warn "$failures check(s) failed"
   return 0

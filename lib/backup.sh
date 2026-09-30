@@ -24,6 +24,7 @@ cmd_backup() {
   BACKUP_STATUS="failed"
   trap 'backup_exit_handler $?' EXIT
   record_state started "$(timestamp)"
+  record_state scheduled "${MACBACKUP_SCHEDULED:-0}"
   info "Backing up $(hostname -s) to $DATA_REPO"
 
   pull_data_repo
