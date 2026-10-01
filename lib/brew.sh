@@ -9,10 +9,7 @@ backup_brew() {
   taps="$(brew tap)"
   formulae="$(brew list --installed-on-request)"
   casks="$(brew list --cask -1 2>/dev/null || true)"
-  mas_apps=""
-  if command -v mas >/dev/null 2>&1; then
-    mas_apps="$(MAS_NO_AUTO_INDEX=1 mas list 2>/dev/null | sort -k2 || true)"
-  fi
+  mas_apps="$(collect_mas_apps)"
   # shellcheck disable=SC2086
   desc_f="$(brew desc $formulae 2>/dev/null || true)"
   # shellcheck disable=SC2086
@@ -27,14 +24,8 @@ backup_brew() {
     if [ -n "$mas_apps" ] && ! printf '%s\n' "$formulae" | grep -qx mas; then echo 'brew "mas"'; fi
     for f in $formulae; do echo "brew \"$f\"$(brew_desc_comment "$f" "$desc_f")"; done
     for c in $casks; do echo "cask \"$c\"$(brew_desc_comment "$c" "$desc_c")"; done
-    printf '%s\n' "$mas_apps" | while IFS= read -r line; do
-      [ -n "$line" ] || continue
-      local id name
-      id="${line%% *}"
-      name="${line#* }"
-      name="${name% (*}"
-      name="$(printf '%s' "$name" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
-      echo "mas \"$name\", id: $id"
+    printf '%s\n' "$mas_apps" | while IFS=$'\t' read -r id name; do
+      [ -n "$id" ] && echo "mas \"$name\", id: $id"
     done
   } > "$tmp"
   mv "$tmp" "$out"
@@ -43,6 +34,35 @@ backup_brew() {
   brew list --formula --versions > "$DATA_DIR/brew/formulae-including-dependencies.txt"
   brew list --cask --versions > "$DATA_DIR/brew/casks.txt" 2>/dev/null || true
   ok "$(printf '%s\n' "$formulae" | grep -c .) formulae, $(printf '%s\n' "$casks" | grep -c .) casks, $(printf '%s\n' "$mas_apps" | grep -c .) App Store apps"
+}
+
+collect_mas_apps() {
+  # App Store apps as "id<TAB>name", from mas (needs Spotlight metadata) and from receipts (needs network).
+  {
+    if command -v mas >/dev/null 2>&1; then
+      mas list 2>/dev/null | sed -n 's/^\([0-9][0-9]*\)[[:space:]][[:space:]]*\(.*[^[:space:]]\)[[:space:]][[:space:]]*(.*)$/\1\t\2/p'
+    fi
+    mas_apps_from_receipts
+  } | sort -t "$(printf '\t')" -k1,1 -u | sort -t "$(printf '\t')" -k2
+}
+
+mas_apps_from_receipts() {
+  # Spotlight often lacks the receipt metadata mas relies on; resolve receipt-bearing apps via the lookup API instead.
+  local app bundle cache="$MACBACKUP_STATE_DIR/mas-lookup" json id name
+  mkdir -p "$cache"
+  for app in /Applications/*.app "$HOME"/Applications/*.app; do
+    [ -e "$app/Contents/_MASReceipt/receipt" ] || continue
+    bundle="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$app/Contents/Info.plist" 2>/dev/null)" || continue
+    if [ -s "$cache/$bundle" ]; then cat "$cache/$bundle"; continue; fi
+    json="$(curl -fsS --max-time 15 "https://itunes.apple.com/lookup?bundleId=$bundle&entity=macSoftware" 2>/dev/null | tr -d '\n')"
+    id="$(printf '%s' "$json" | sed -n 's/.*"trackId":\([0-9][0-9]*\).*/\1/p')"
+    name="$(printf '%s' "$json" | sed -n 's/.*"trackName":"\([^"]*\)".*/\1/p')"
+    if [ -n "$id" ] && [ -n "$name" ]; then
+      printf '%s\t%s\n' "$id" "$name" | tee "$cache/$bundle"
+    else
+      warn "App Store app $(basename "$app" .app) ($bundle) could not be resolved to an App Store id"
+    fi
+  done
 }
 
 brew_desc_comment() {
