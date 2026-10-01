@@ -13,7 +13,7 @@ glpat-[A-Za-z0-9_-]{20,}
 eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}'
 
 # Plist key names (lower-cased) whose string or data values are treated as secrets.
-PLIST_SECRET_KEY_REGEX='(serial|licen[cs]e|passw|token|secret|apikey|api_key|private_key|credential)'
+PLIST_SECRET_KEY_REGEX='(serial|licen[cs]e|registration|passw|token|secret|apikey|api_key|private_key|credential|(^|[._-])(key|cert|certificate)</key>)'
 
 # Case-insensitive "key = value" assignments with a secret-looking key.
 SECRET_PATTERNS_CI='(api[_-]?key|secret|passw(or)?d|token|client[_-]?secret|private[_-]?key)["'"'"']?[[:space:]]*[:=][[:space:]]*["'"'"']?[A-Za-z0-9_./+=-]{12,}'
@@ -61,6 +61,6 @@ scan_plists() {
   # shellcheck disable=SC2016
   find "$1" -name '*.plist' -not -path '*/.git/*' -print0 2>/dev/null | xargs -0 awk -v re="$PLIST_SECRET_KEY_REGEX" '
     /<key>/ { flag = (tolower($0) ~ re) ? FNR : 0; next }
-    flag && FNR == flag + 1 && $0 ~ /<(string|data)>[^<]+</ { print FILENAME ":" FNR ":" $0 }
+    flag && FNR == flag + 1 && ($0 ~ /<(string|data)>[^<]+</ || $0 ~ /<data>$/) { print FILENAME ":" FNR ":" $0 }
   ' 2>/dev/null || true
 }

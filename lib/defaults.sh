@@ -101,10 +101,11 @@ strip_secret_keys() {
 
 plist_secret_top_keys() {
   # Top-level key under which a secret-looking key with a non-empty string or data value appears.
+  # Keys are matched lower-cased with their closing tag, so patterns may anchor on the end of the name.
   awk -v re="$PLIST_SECRET_KEY_REGEX" '
     /^\t<key>/ { top = $0; sub(/^\t<key>/, "", top); sub(/<\/key>$/, "", top) }
     /<key>/ { flag = (tolower($0) ~ re) ? FNR : 0; next }
-    flag && FNR == flag + 1 && $0 ~ /<(string|data)>[^<]+</ { print top }
+    flag && FNR == flag + 1 && ($0 ~ /<(string|data)>[^<]+</ || $0 ~ /<data>$/) { print top }
   ' "$1" | plist_unescape
 }
 
